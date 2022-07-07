@@ -1,3 +1,6 @@
+//go:build !wasm
+// +build !wasm
+
 /*
  * Flow Emulator
  *
@@ -89,6 +92,7 @@ type Config struct {
 	ServicePrivateKey            crypto.PrivateKey
 	ServiceKeySigAlgo            crypto.SignatureAlgorithm
 	ServiceKeyHashAlgo           crypto.HashAlgorithm
+	SimpleAddresses              bool
 	GenesisTokenSupply           cadence.UFix64
 	TransactionExpiry            uint
 	StorageLimitEnabled          bool
@@ -250,6 +254,7 @@ func configureBlockchain(conf *Config, store storage.Store) (*emulator.Blockchai
 		emulator.WithGenesisTokenSupply(conf.GenesisTokenSupply),
 		emulator.WithTransactionMaxGasLimit(conf.TransactionMaxGasLimit),
 		emulator.WithScriptGasLimit(conf.ScriptGasLimit),
+		emulator.WithSimpleAddresses(conf.SimpleAddresses),
 		emulator.WithTransactionExpiry(conf.TransactionExpiry),
 		emulator.WithStorageLimitEnabled(conf.StorageLimitEnabled),
 		emulator.WithMinimumStorageReservation(conf.MinimumStorageReservation),

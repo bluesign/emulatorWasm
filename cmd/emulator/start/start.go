@@ -164,6 +164,7 @@ func Cmd(getServiceKey serviceKeyFunc) *cobra.Command {
 				ServiceKeyHashAlgo:           serviceKeyHashAlgo,
 				Persist:                      conf.Persist,
 				DBPath:                       conf.DBPath,
+				SimpleAddresses:              conf.SimpleAddresses,
 				GenesisTokenSupply:           parseCadenceUFix64(conf.TokenSupply, "token-supply"),
 				TransactionMaxGasLimit:       uint64(conf.TransactionMaxGasLimit),
 				ScriptGasLimit:               uint64(conf.ScriptGasLimit),

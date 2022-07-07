@@ -237,9 +237,9 @@ func WithStore(store storage.Store) Option {
 }
 
 // WithSimpleAddresses enables simple addresses, which are sequential starting with 0x01.
-func WithSimpleAddresses() Option {
+func WithSimpleAddresses(enabled bool) Option {
 	return func(c *config) {
-		c.SimpleAddresses = true
+		c.SimpleAddresses = enabled
 	}
 }
 
