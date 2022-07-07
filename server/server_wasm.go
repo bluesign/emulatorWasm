@@ -53,6 +53,10 @@ type EmulatorServer struct {
 	blocks     graceland.Routine
 	blockchain *emulator.Blockchain
 }
+type HTTPHeader struct {
+	Key   string
+	Value string
+}
 
 const (
 	defaultGRPCPort               = 3569
@@ -61,23 +65,6 @@ const (
 	defaultLivenessCheckTolerance = time.Second
 	defaultDBGCInterval           = time.Minute * 5
 	defaultDBGCRatio              = 0.5
-)
-
-var (
-	defaultHTTPHeaders = []HTTPHeader{
-		{
-			Key:   "Access-Control-Allow-Origin",
-			Value: "*",
-		},
-		{
-			Key:   "Access-Control-Allow-Methods",
-			Value: "POST, GET, OPTIONS, PUT, DELETE",
-		},
-		{
-			Key:   "Access-Control-Allow-Headers",
-			Value: "*",
-		},
-	}
 )
 
 // Config is the configuration for an emulator server.
@@ -277,10 +264,6 @@ func sanitizeConfig(conf *Config) *Config {
 
 	if conf.RESTPort == 0 {
 		conf.RESTPort = defaultRESTPort
-	}
-
-	if conf.HTTPHeaders == nil {
-		conf.HTTPHeaders = defaultHTTPHeaders
 	}
 
 	if conf.DBGCInterval == 0 {
