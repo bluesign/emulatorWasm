@@ -78,26 +78,27 @@ var (
 
 // Config is the configuration for an emulator server.
 type Config struct {
-	GRPCPort                  int
-	GRPCDebug                 bool
-	AdminPort                 int
-	RESTPort                  int
-	RESTDebug                 bool
-	HTTPHeaders               []HTTPHeader
-	BlockTime                 time.Duration
-	ServicePublicKey          crypto.PublicKey
-	ServicePrivateKey         crypto.PrivateKey
-	ServiceKeySigAlgo         crypto.SignatureAlgorithm
-	ServiceKeyHashAlgo        crypto.HashAlgorithm
-	GenesisTokenSupply        cadence.UFix64
-	TransactionExpiry         uint
-	StorageLimitEnabled       bool
-	MinimumStorageReservation cadence.UFix64
-	StorageMBPerFLOW          cadence.UFix64
-	TransactionFeesEnabled    bool
-	TransactionMaxGasLimit    uint64
-	ScriptGasLimit            uint64
-	Persist                   bool
+	GRPCPort                     int
+	GRPCDebug                    bool
+	AdminPort                    int
+	RESTPort                     int
+	RESTDebug                    bool
+	HTTPHeaders                  []HTTPHeader
+	BlockTime                    time.Duration
+	ServicePublicKey             crypto.PublicKey
+	ServicePrivateKey            crypto.PrivateKey
+	ServiceKeySigAlgo            crypto.SignatureAlgorithm
+	ServiceKeyHashAlgo           crypto.HashAlgorithm
+	GenesisTokenSupply           cadence.UFix64
+	TransactionExpiry            uint
+	StorageLimitEnabled          bool
+	MinimumStorageReservation    cadence.UFix64
+	StorageMBPerFLOW             cadence.UFix64
+	TransactionFeesEnabled       bool
+	TransactionValidationEnabled bool
+	TransactionMaxGasLimit       uint64
+	ScriptGasLimit               uint64
+	Persist                      bool
 	// DBPath is the path to the Badger database on disk.
 	DBPath string
 	// DBGCInterval is the time interval at which to garbage collect the Badger value log.
@@ -254,6 +255,7 @@ func configureBlockchain(conf *Config, store storage.Store) (*emulator.Blockchai
 		emulator.WithMinimumStorageReservation(conf.MinimumStorageReservation),
 		emulator.WithStorageMBPerFLOW(conf.StorageMBPerFLOW),
 		emulator.WithTransactionFeesEnabled(conf.TransactionFeesEnabled),
+		emulator.WithTransactionValidationEnabled(conf.TransactionValidationEnabled),
 	}
 
 	if conf.ServicePrivateKey != nil {
