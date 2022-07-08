@@ -7,12 +7,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	emulator "github.com/onflow/flow-emulator"
+	gosdk "github.com/onflow/flow-go-sdk"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"syscall/js"
 )
+
+var blockChainRef *emulator.Blockchain
 
 // NewPromise creates a new JavaScript Promise
 func NewPromise() (p js.Value, resolve func(interface{}), reject func(interface{})) {
@@ -135,11 +139,38 @@ func Request(r js.Value) *http.Request {
 }
 
 // Serve serves HTTP requests using handler or http.DefaultServeMux if handler is nil.
-func Serve(handler http.Handler) func() {
+func Serve(handler http.Handler, blockchain *emulator.Blockchain) func() {
 	var h = handler
 	if h == nil {
 		h = http.DefaultServeMux
 	}
+	blockChainRef = blockchain
+	var getAccountStorage = js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		var resPromise, resolve, reject = NewPromise()
+
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					if err, ok := r.(error); ok {
+						reject(fmt.Sprintf("wasmhttp: panic: %+v\n", err))
+					} else {
+						reject(fmt.Sprintf("wasmhttp: panic: %v\n", r))
+					}
+				}
+			}()
+
+			addr := gosdk.HexToAddress(args[0].String())
+			fmt.Println(addr)
+			v, _ := blockChainRef.GetAccountStorage(addr)
+			j, _ := json.Marshal(v)
+			fmt.Println(string(j))
+
+			resolve(js.ValueOf(string(j)))
+		}()
+
+		return resPromise
+
+	})
 
 	var cb = js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		var resPromise, resolve, reject = NewPromise()
@@ -166,6 +197,7 @@ func Serve(handler http.Handler) func() {
 	})
 
 	js.Global().Call("setHandler", cb)
+	js.Global().Call("setGetAccountStorage", getAccountStorage)
 
 	return cb.Release
 }

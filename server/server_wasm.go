@@ -128,6 +128,7 @@ func NewEmulatorServer(logger *logrus.Logger, conf *Config) *EmulatorServer {
 
 	blockchain, err := configureBlockchain(conf, store.Store())
 	if err != nil {
+		fmt.Println(err)
 		logger.WithError(err).Error("❗  Failed to configure emulated blockchain")
 		return nil
 	}
@@ -188,7 +189,7 @@ func (s *EmulatorServer) Start() {
 	}
 
 	s.logger.AddHook(&WasmLogHook{})
-	wasmhttp.Serve(srv.Handler)
+	wasmhttp.Serve(srv.Handler, s.blockchain)
 
 	err = s.storage.Start()
 
