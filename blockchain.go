@@ -145,6 +145,7 @@ type config struct {
 	TransactionValidationEnabled bool
 	MinimumStorageReservation    cadence.UFix64
 	StorageMBPerFLOW             cadence.UFix64
+	Logger                    zerolog.Logger
 }
 
 func (conf config) GetStore() storage.Store {
@@ -198,11 +199,21 @@ var defaultConfig = func() config {
 		TransactionExpiry:            0, // TODO: replace with sensible default
 		StorageLimitEnabled:          true,
 		TransactionValidationEnabled: true,
+		Logger:                    zerolog.Nop(),
 	}
 }()
 
 // Option is a function applying a change to the emulator config.
 type Option func(*config)
+
+//WithLogger sets the logger
+func WithLogger(
+	logger zerolog.Logger,
+) Option {
+	return func(c *config) {
+		c.Logger = logger
+	}
+}
 
 // WithServicePublicKey sets the service key from a public key.
 func WithServicePublicKey(
