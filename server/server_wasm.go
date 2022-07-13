@@ -30,7 +30,6 @@ import (
 	"github.com/onflow/flow-go-sdk/crypto"
 	"github.com/onflow/flow-go/engine/access/rest"
 	"github.com/onflow/flow-go/fvm"
-	"github.com/onflow/flow-go/model/flow"
 	"github.com/psiemens/graceland"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
@@ -183,7 +182,7 @@ func (s *EmulatorServer) Start() {
 		WithField("port", s.config.RESTPort).
 		Info("🌱  Starting REST API on wasm")
 
-	srv, err := rest.NewServer(backend.NewAdapter(s.backend), "127.0.0.1:3333", zerolog.Logger{}, flow.Emulator.Chain())
+	srv, err := rest.NewServer(backend.NewAdapter(s.backend), "127.0.0.1:3333", zerolog.Logger{}, s.blockchain.GetChain())
 	if err != nil {
 		s.logger.WithError(err).Error("❗  Backend error")
 	}
