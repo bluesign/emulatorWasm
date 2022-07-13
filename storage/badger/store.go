@@ -104,6 +104,9 @@ func (s *Store) unlockGit() {
 }
 
 func (s *Store) JumpToContext(context string) error {
+	if s.dbGitRepository == nil {
+		return nil
+	}
 	s.unlockGit()
 	defer s.lockGit()
 	err := s.db.Close()
@@ -174,6 +177,9 @@ func (s *Store) JumpToContext(context string) error {
 }
 
 func (s *Store) newCommit(message string) error {
+	if s.dbGitRepository == nil {
+		return nil
+	}
 	s.unlockGit()
 	defer s.lockGit()
 	err := s.Sync()
@@ -256,29 +262,30 @@ func New(opts ...Opt) (*Store, error) {
 
 // setups git, setup sets up in-memory indexes and prepares the store for use.
 func (s *Store) setup() error {
-
+	//check if we can support git
 	dbgit, err := s.openRepository(s.path)
 	s.dbGitRepository = dbgit
-	if err != nil {
-		return err
-	}
 
-	w, _ := dbgit.Worktree()
-	r, _ := dbgit.Head()
-	if r != nil {
-		_ = w.Reset(&git.ResetOptions{
-			Mode:   git.HardReset,
-			Commit: r.Hash(),
-		})
-	}
-	err = s.newCommit("Emulator Started New Session")
-	if err != nil {
-		return err
-	}
-	s.lockGit()
+	if err == nil {
+		s.newCommit("Emulator Started New Session")
+		/*
+			w, _ := dbgit.Worktree()
+			r, _ := dbgit.Head()
+			if r != nil {
+				_ = w.Reset(&git.ResetOptions{
+					Mode:   git.HardReset,
+					Commit: r.Hash(),
+				})
+			}
+			err = s.newCommit("Emulator Started New Session")
+			if err != nil {
+				return err
+			}
+			s.lockGit()
 
-	s.db.RLock()
-	defer s.db.RUnlock()
+			s.db.RLock()
+			defer s.db.RUnlock()*/
+	}
 
 	iterOpts := badger.DefaultIteratorOptions
 	// only search for changelog entries
